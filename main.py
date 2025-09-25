@@ -1,7 +1,6 @@
 import re
 import sys
 import json
-import subprocess
 from datetime import datetime
 
 def is_interesting(command, keywords):
@@ -24,39 +23,20 @@ def generate_summary(commands, keywords):
 
     return summary, interesting_commands
 
-def get_bash_history():
-    result = subprocess.run("history", shell=True, capture_output=True, text=True, executable='/bin/bash')
-    return result.stdout.splitlines()
-
 def main():
     with open("config.json", "r") as f:
         config = json.load(f)
 
-    with open("state.json", "r") as f:
-        state = json.load(f)
+    bash_history_file_path = config.get("bash_history_file_path", "bash_history.txt")
+    with open(bash_history_file_path, "r") as f:
+        commands = f.readlines()
 
-    last_processed_command_number = state.get("last_processed_command_number", 0)
-
-    history_lines = get_bash_history()
-    new_commands = []
-    max_command_number = last_processed_command_number
-
-    for line in history_lines:
-        match = re.match(r"\s*(\d+)\s+(.*)", line)
-        if match:
-            command_number = int(match.group(1))
-            command = match.group(2)
-            if command_number > last_processed_command_number:
-                new_commands.append(command)
-                if command_number > max_command_number:
-                    max_command_number = command_number
-
-    if not new_commands:
-        print("No new commands to process.")
+    if not commands:
+        print("No commands to process.")
         return
 
     interesting_keywords = config.get("interesting_keywords", [])
-    summary, interesting_commands = generate_summary(new_commands, interesting_keywords)
+    summary, interesting_commands = generate_summary(commands, interesting_keywords)
 
     # Save the summary to the Obsidian vault
     vault_path = config["obsidian_vault_path"]
@@ -77,11 +57,6 @@ def main():
                 if 1 <= i <= len(interesting_commands):
                     f.write(interesting_commands[i-1] + "\n")
         print("Favorite commands saved to favorite_commands.txt")
-
-    # Update state
-    state["last_processed_command_number"] = max_command_number
-    with open("state.json", "w") as f:
-        json.dump(state, f)
 
 if __name__ == "__main__":
     main()

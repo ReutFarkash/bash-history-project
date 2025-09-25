@@ -1,4 +1,5 @@
 {
     "obsidian_vault_path": "obsidian_vault",
-    "interesting_keywords": ["git", "npm", "docker", "kubectl"]
+    "interesting_keywords": ["git", "npm", "docker", "kubectl"],
+    "bash_history_file_path": "reuts_bash_history.txt"
 }
