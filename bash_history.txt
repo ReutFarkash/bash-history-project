@@ -1,0 +1,8 @@
+ls -l
+echo "hello world"
+git status
+cp file1.txt file2.txt
+mv file2.txt new_dir/
+mkdir new_project
+cd new_project
+npm init -y
