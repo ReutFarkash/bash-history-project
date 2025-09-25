@@ -1,5 +1,6 @@
 import re
 import sys
+import json
 from datetime import datetime
 
 def is_important(command):
@@ -24,13 +25,16 @@ def generate_summary(commands):
     return summary, important_commands
 
 def main():
+    with open("config.json", "r") as f:
+        config = json.load(f)
+
     with open("bash_history.txt", "r") as f:
         commands = f.readlines()
 
     summary, important_commands = generate_summary(commands)
 
     # Save the summary to the Obsidian vault
-    vault_path = "obsidian_vault"
+    vault_path = config["obsidian_vault_path"]
     today = datetime.now().strftime('%Y-%m-%d')
     summary_file = f"{vault_path}/{today}.md"
 
